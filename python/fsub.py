@@ -1,10 +1,16 @@
-import vim
-import re
+quoted_match = None
 
 
-quoted_match = re.compile('''(f)?(?P<quote>['"]).*?(?P=quote)''')
+def get_quoted_match():
+    import re
+    global quoted_match
+    if quoted_match is None:
+        quoted_match = re.compile('''(f)?(?P<quote>['"]).*?(?P=quote)''')
+    return quoted_match
+
+
 def find_quoted_string(line, col):
-    for match in quoted_match.finditer(line):
+    for match in get_quoted_match().finditer(line):
         # if match.start() <= col and match.end() >= col:
         if match.end() >= col:
             if match.group(1):
@@ -19,6 +25,8 @@ def find_quoted_string(line, col):
 
 
 def fsub_func():
+    import vim
+
     row, col = vim.current.window.cursor
     current_line = vim.current.buffer[row-1]
     new_line = None
